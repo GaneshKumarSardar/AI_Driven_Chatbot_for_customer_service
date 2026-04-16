@@ -96,21 +96,72 @@ Database
 
 ---
 
-🏗️ System Architecture
+🏗️ System Architecture (Visualized)
 
-User → Frontend UI → REST API → Service Layer
-                          ↓
-                    FAQ Matching
-                          ↓
-        ┌────────────── YES ──────────────┐
-        ↓                                ↓
- Return FAQ Answer                Send to AI Model
-                                        ↓
-                                Generate Response
-                                        ↓
-                              Store in Database
-                                        ↓
-                                  Return Response
+                   ┌──────────────────────────┐
+                   │        🧑 User            │
+                   └────────────┬─────────────┘
+                                │
+                                ▼
+                   ┌──────────────────────────┐
+                   │     🌐 Frontend UI       │
+                   │  (HTML, CSS, JS Chat)   │
+                   └────────────┬─────────────┘
+                                │ HTTP Request
+                                ▼
+                   ┌──────────────────────────┐
+                   │   ⚙️ Spring Boot API     │
+                   │      (Controller)        │
+                   └────────────┬─────────────┘
+                                │
+                                ▼
+                   ┌──────────────────────────┐
+                   │     🧠 Service Layer     │
+                   │ (Core Business Logic)    │
+                   └────────────┬─────────────┘
+                                │
+                ┌───────────────┼───────────────┐
+                ▼                               ▼
+    ┌──────────────────────┐         ┌────────────────────────┐
+    │     📚 FAQ Engine     │         │     🤖 AI Engine        │
+    │ (Database Matching)  │         │   (Ollama - LLM)        │
+    └──────────┬───────────┘         └──────────┬─────────────┘
+               │ YES MATCH                     │ NO MATCH
+               ▼                               ▼
+        ┌──────────────────────────┐   ┌──────────────────────────┐
+        │   Return FAQ Response     │   │   Generate AI Response    │
+        └────────────┬─────────────┘   └────────────┬─────────────┘
+                     │                               │
+                     └───────────────┬───────────────┘
+                                     ▼
+                   ┌──────────────────────────┐
+                   │     🗄️ PostgreSQL DB      │
+                   │ (Chat + FAQ Storage)     │
+                   └────────────┬─────────────┘
+                                │
+                                ▼
+                   ┌──────────────────────────┐
+                   │   📤 Send Response to UI  │
+                   └──────────────────────────┘
+
+---
+
+🔍 Flow Explanation
+
+- User sends a message from the UI
+- Request goes to Spring Boot backend
+- Service layer processes the logic
+- System first checks FAQ database
+- If match found → returns instantly
+- Else → forwards to AI model (Ollama)
+- Response is stored in PostgreSQL
+- Final output is sent back to user
+
+---
+
+<p align="center">
+  <b>⚡ Hybrid Flow = Fast (FAQ) + Smart (AI)</b>
+</p>
 
 ---
 
